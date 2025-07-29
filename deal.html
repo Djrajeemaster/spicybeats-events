@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deal Details</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header><h1>Deal Details</h1></header>
+  <main id="deal-content">Loading deal...</main>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const dealId = urlParams.get('id');
+
+    fetch(`api/get_deal.php?id=${dealId}`)
+      .then(res => res.json())
+      .then(deal => {
+        const container = document.getElementById('deal-content');
+        container.innerHTML = `
+          ${deal.image ? `<img src="images/${deal.image}" style="width:100%; border-radius:10px;" />` : ''}
+          <h2>${deal.title}</h2>
+          <p>${deal.description}</p>
+          <span class="badge">${deal.status}</span>
+          <p><strong>Votes:</strong> ${deal.votes || 0}</p>
+        `;
+      })
+      .catch(() => {
+        document.getElementById('deal-content').innerHTML = '<p>Failed to load deal.</p>';
+      });
+  </script>
+</body>
+</html>
