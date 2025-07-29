@@ -45,10 +45,3 @@ try {
 } catch (Exception $e) {
     echo json_encode(['error' => 'An error occurred', 'details' => $e->getMessage()]);
 }
-?>
-<form method="POST">
-    <input type="text" name="name" placeholder="Name" />
-    <input type="email" name="email" placeholder="Email" />
-    <input type="password" name="password" placeholder="New Password" />
-    <button type="submit">Update Profile</button>
-</form>

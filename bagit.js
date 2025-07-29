@@ -1,5 +1,11 @@
 const dealsContainer = document.getElementById('deals-container');
 const categorySelect = document.getElementById('category-select');
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
+const loadMoreBtn = document.getElementById('load-more');
+let currentPage = 1;
+let lastCategory = '';
+let lastSearch = '';
 
 // Load categories into dropdown
 fetch('api/get_categories.php')
@@ -14,14 +20,22 @@ fetch('api/get_categories.php')
   });
 
 categorySelect.addEventListener('change', () => {
-  loadDeals(categorySelect.value);
+  currentPage = 1;
+  lastCategory = categorySelect.value;
+  loadDeals(lastCategory, lastSearch, true);
+});
+
+searchBtn.addEventListener('click', () => {
+  currentPage = 1;
+  lastSearch = searchInput.value;
+  loadDeals(lastCategory, lastSearch, true);
 });
 
 function vote(dealId, type) {
   fetch('api/vote.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ deal_id: dealId, vote: type }) // 👈 matches PHP
+    body: JSON.stringify({ deal_id: dealId, vote_type: type })
   })
   .then(res => res.json())
   .then(data => {
@@ -40,16 +54,21 @@ function vote(dealId, type) {
   });
 }
 
-function loadDeals(category = '') {
-  let url = 'api/get_deals.php';
+function loadDeals(category = '', search = '', reset = false) {
+  let url = `api/get_deals.php?page=${currentPage}`;
   if (category) {
-    url += `?category=${encodeURIComponent(category)}`;
+    url += `&category=${encodeURIComponent(category)}`;
+  }
+  if (search) {
+    url += `&search=${encodeURIComponent(search)}`;
   }
 
   fetch(url)
     .then(response => response.json())
     .then(deals => {
-      dealsContainer.innerHTML = '';
+      if (reset) {
+        dealsContainer.innerHTML = '';
+      }
       deals.forEach(deal => {
         const card = document.createElement('div');
         card.className = 'deal-card';
@@ -67,11 +86,21 @@ function loadDeals(category = '') {
         `;
         dealsContainer.appendChild(card);
       });
+      loadMoreBtn.style.display = deals.length === 0 || deals.length < 10 ? 'none' : 'block';
     })
     .catch(error => {
       console.error('Error loading deals:', error);
       dealsContainer.innerHTML = '<p>Failed to load deals. Please try again later.</p>';
     });
 }
+loadMoreBtn.addEventListener('click', () => {
+  currentPage++;
+  loadDeals(lastCategory, lastSearch);
+});
 
-loadDeals();
+function init() {
+  currentPage = 1;
+  loadDeals();
+}
+
+init();

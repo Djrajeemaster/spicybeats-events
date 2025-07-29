@@ -7,7 +7,8 @@ $title = $data['title'] ?? '';
 $description = $data['description'] ?? '';
 $image = $data['image'] ?? '';
 $category = $data['category'] ?? '';
-$user_id = $data['user_id'] ?? null;
+$expiry  = $data['expiry_timestamp'] ?? null;
+$user_id  = $data['user_id'] ?? null;
 
 if (!$title || !$description || !$category || !$user_id) {
   echo json_encode(['error' => 'Missing required fields']);
@@ -15,17 +16,11 @@ if (!$title || !$description || !$category || !$user_id) {
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT is_verified FROM admins WHERE id = ?");
-    $stmt->execute([$user_id]);
-    $user = $stmt->fetch();
-
-    $status = ($user && $user['is_verified']) ? 'approved' : 'pending';
-
-    $insert = $pdo->prepare("INSERT INTO deals (title, description, image, category, status, user_id) VALUES (?, ?, ?, ?, ?, ?)");
-    $insert->execute([$title, $description, $image, $category, $status, $user_id]);
+    $status = 'pending';
+    $insert = $pdo->prepare("INSERT INTO deals (title, description, image, category, expiry_timestamp, status, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $insert->execute([$title, $description, $image, $category, $expiry, $status, $user_id]);
 
     echo json_encode(['success' => true, 'status' => $status]);
 } catch (Exception $e) {
     echo json_encode(['error' => 'Submission failed', 'details' => $e->getMessage()]);
 }
-?>

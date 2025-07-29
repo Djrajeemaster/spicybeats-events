@@ -1,19 +1,21 @@
 <?php
-session_start();  // Start the session to store login status
-
-$admin_user = 'admin';
-$admin_pass = 'admin123';
+session_start();
+require_once __DIR__ . '/../config/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Check if username and password match the admin credentials
-    if ($_POST['username'] === $admin_user && $_POST['password'] === $admin_pass) {
-        $_SESSION['admin'] = true;  // Set session variable for admin login
-        
-        // Use a relative path here to avoid extra `/admin/`
-        header('Location: dashboard.php');  // Relative path
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
+
+    $stmt = $pdo->prepare('SELECT password FROM admins WHERE username = ?');
+    $stmt->execute([$username]);
+    $admin = $stmt->fetch();
+
+    if ($admin && password_verify($password, $admin['password'])) {
+        $_SESSION['admin_logged_in'] = true;
+        header('Location: dashboard.php');
         exit;
     } else {
-        $error = 'Invalid credentials';  // Display error message for invalid credentials
+        $error = 'Invalid credentials';
     }
 }
 ?>

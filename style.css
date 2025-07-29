@@ -43,3 +43,16 @@ header {
   text-align: center;
   padding: 10px;
 }
+
+@media (max-width: 600px) {
+  #deals-container {
+    padding: 10px;
+  }
+  .deal-card {
+    margin-bottom: 15px;
+  }
+  .filter-bar {
+    display: flex;
+    flex-direction: column;
+  }
+}
