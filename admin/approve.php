@@ -1,6 +1,6 @@
 <?php
 session_start();
-if (!isset($_SESSION['admin'])) {
+if (!isset($_SESSION['admin_logged_in'])) {
     header('Location: login.php');
     exit;
 }
@@ -18,6 +18,12 @@ if ($deal_id) {
     $message = "Deal with ID $deal_id has been approved.";
     $stmt = $pdo->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
     $stmt->execute([$admin_id, $message]);
+
+    // Send optional email
+    $adminEmail = getenv('ADMIN_EMAIL');
+    if ($adminEmail) {
+        @mail($adminEmail, 'Deal approved', $message);
+    }
 }
 
 header('Location: dashboard.php');
