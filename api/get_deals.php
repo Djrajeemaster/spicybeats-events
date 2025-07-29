@@ -9,6 +9,7 @@ try {
     $status = 'approved';
     $category = $_GET['category'] ?? null;
     $search = $_GET['search'] ?? null;
+    $sort = $_GET['sort'] ?? 'recent';
     $page = max(1, (int)($_GET['page'] ?? 1));
     $limit = 10;
     $offset = ($page - 1) * $limit;
@@ -37,7 +38,14 @@ try {
         $params[] = $searchTerm;
     }
 
-    $sql .= " GROUP BY d.id ORDER BY d.created_at DESC LIMIT $limit OFFSET $offset";
+    $orderBy = 'd.created_at DESC';
+    if ($sort === 'votes') {
+        $orderBy = 'votes DESC';
+    } elseif ($sort === 'rating') {
+        $orderBy = 'avg_rating DESC';
+    }
+
+    $sql .= " GROUP BY d.id ORDER BY $orderBy LIMIT $limit OFFSET $offset";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);

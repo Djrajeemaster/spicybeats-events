@@ -1,6 +1,9 @@
 # SpicyBeats Events
 
 This project is a simple PHP demo for submitting and voting on deals.
+Users can log in, submit deals and vote. The main page now includes a
+"Sort by" option for ordering deals by recent submissions, vote count
+or rating. A logout endpoint (`logout.php`) has been added as well.
 
 ## Setup
 
