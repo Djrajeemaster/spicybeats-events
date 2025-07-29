@@ -21,7 +21,7 @@ function vote(dealId, type) {
   fetch('api/vote.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ deal_id: dealId, vote: type }) // 👈 matches PHP
+    body: JSON.stringify({ deal_id: dealId, vote_type: type })
   })
   .then(res => res.json())
   .then(data => {

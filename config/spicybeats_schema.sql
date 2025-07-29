@@ -4,8 +4,13 @@ CREATE TABLE IF NOT EXISTS deals (
   title VARCHAR(255) NOT NULL,
   description TEXT NOT NULL,
   image VARCHAR(255),
-  status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  category VARCHAR(100),
+  user_id INT,
+  is_verified TINYINT(1) DEFAULT 0,
+  expiry_timestamp DATETIME NULL,
+  status ENUM('pending', 'approved', 'rejected', 'expired') DEFAULT 'pending',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS votes (
@@ -20,6 +25,14 @@ CREATE TABLE IF NOT EXISTS admins (
   username VARCHAR(100) NOT NULL,
   password VARCHAR(255) NOT NULL,
   role ENUM('admin', 'moderator') DEFAULT 'admin'
+);
+
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(100) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('admin','user') DEFAULT 'user',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Optional future table
