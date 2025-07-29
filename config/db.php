@@ -1,8 +1,12 @@
 <?php
-$host = 'localhost';
-$db = 'u381433869_spicydeals';
-$user = 'u381433869_spicybeats';
-$pass = 'Mryuvan@143';
+$host = getenv('DB_HOST') ?: 'localhost';
+$db   = getenv('DB_NAME');
+$user = getenv('DB_USER');
+$pass = getenv('DB_PASS');
+
+if (!$db || !$user) {
+    throw new RuntimeException('Database environment variables not set');
+}
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";

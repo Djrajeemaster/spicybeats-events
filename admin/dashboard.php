@@ -1,13 +1,15 @@
 <?php
-session_start();  // Start the session to check if the user is logged in
+session_start();
 
-// Check if the admin is logged in
-if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: login.php');  // If not logged in, redirect to the login page
     exit;
 }
 
 require_once __DIR__ . '/../config/db.php';  // Database connection
+
+// Expire outdated deals
+$pdo->exec("UPDATE deals SET status = 'expired' WHERE expiry_timestamp IS NOT NULL AND expiry_timestamp <= NOW() AND status != 'expired'");
 
 // Filtering & Sorting logic
 $categoryFilter = isset($_GET['category']) ? $_GET['category'] : '';
@@ -44,6 +46,14 @@ $stmt = $pdo->prepare($totalDealsQuery);
 $stmt->execute();
 $totalDeals = $stmt->fetchColumn();
 $totalPages = ceil($totalDeals / $perPage);
+
+// Analytics counts
+$counts = [];
+foreach (['approved', 'pending', 'rejected'] as $status) {
+    $cStmt = $pdo->prepare('SELECT COUNT(*) FROM deals WHERE status = ?');
+    $cStmt->execute([$status]);
+    $counts[$status] = $cStmt->fetchColumn();
+}
 ?>
 
 <!DOCTYPE html>
@@ -67,7 +77,15 @@ $totalPages = ceil($totalDeals / $perPage);
 </head>
 <body>
   <h2>Admin Dashboard</h2>
-  <p><a href="logout.php">Logout</a></p>
+  <p>
+    <a href="logout.php">Logout</a> |
+    <a href="users.php">Manage Users</a>
+  </p>
+  <div class="analytics">
+    <strong>Approved:</strong> <?= $counts['approved'] ?> |
+    <strong>Pending:</strong> <?= $counts['pending'] ?> |
+    <strong>Rejected:</strong> <?= $counts['rejected'] ?>
+  </div>
 
   <!-- Filters -->
   <form method="GET">
