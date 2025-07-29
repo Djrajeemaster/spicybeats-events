@@ -2,10 +2,12 @@ const dealsContainer = document.getElementById('deals-container');
 const categorySelect = document.getElementById('category-select');
 const searchInput = document.getElementById('search-input');
 const searchBtn = document.getElementById('search-btn');
+const sortSelect = document.getElementById('sort-select');
 const loadMoreBtn = document.getElementById('load-more');
 let currentPage = 1;
 let lastCategory = '';
 let lastSearch = '';
+let lastSort = 'recent';
 
 // Load categories into dropdown
 fetch('api/get_categories.php')
@@ -22,13 +24,19 @@ fetch('api/get_categories.php')
 categorySelect.addEventListener('change', () => {
   currentPage = 1;
   lastCategory = categorySelect.value;
-  loadDeals(lastCategory, lastSearch, true);
+  loadDeals(lastCategory, lastSearch, lastSort, true);
 });
 
 searchBtn.addEventListener('click', () => {
   currentPage = 1;
   lastSearch = searchInput.value;
-  loadDeals(lastCategory, lastSearch, true);
+  loadDeals(lastCategory, lastSearch, lastSort, true);
+});
+
+sortSelect.addEventListener('change', () => {
+  currentPage = 1;
+  lastSort = sortSelect.value;
+  loadDeals(lastCategory, lastSearch, lastSort, true);
 });
 
 function vote(dealId, type) {
@@ -54,13 +62,16 @@ function vote(dealId, type) {
   });
 }
 
-function loadDeals(category = '', search = '', reset = false) {
+function loadDeals(category = '', search = '', sort = 'recent', reset = false) {
   let url = `api/get_deals.php?page=${currentPage}`;
   if (category) {
     url += `&category=${encodeURIComponent(category)}`;
   }
   if (search) {
     url += `&search=${encodeURIComponent(search)}`;
+  }
+  if (sort) {
+    url += `&sort=${encodeURIComponent(sort)}`;
   }
 
   fetch(url)
@@ -98,12 +109,12 @@ function loadDeals(category = '', search = '', reset = false) {
 }
 loadMoreBtn.addEventListener('click', () => {
   currentPage++;
-  loadDeals(lastCategory, lastSearch);
+  loadDeals(lastCategory, lastSearch, lastSort);
 });
 
 function init() {
   currentPage = 1;
-  loadDeals();
+  loadDeals(lastCategory, lastSearch, lastSort);
 }
 
 init();

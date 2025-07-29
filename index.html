@@ -10,7 +10,12 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header><h1>Welcome to SpicyBeats</h1></header>
+  <header>
+    <h1>Welcome to SpicyBeats</h1>
+    <nav>
+      <a href="logout.php">Logout</a>
+    </nav>
+  </header>
 
   <div class="filter-bar">
     <label for="category-select">Category:</label>
@@ -19,6 +24,12 @@
     </select>
     <input type="text" id="search-input" placeholder="Search deals" />
     <button id="search-btn">Search</button>
+    <label for="sort-select">Sort by:</label>
+    <select id="sort-select">
+      <option value="recent">Recent</option>
+      <option value="votes">Votes</option>
+      <option value="rating">Rating</option>
+    </select>
   </div>
 
   <main>
